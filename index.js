@@ -2,7 +2,7 @@ import { Node } from './js/node.js';
 
 // make graph
 /**
- * 
+ * https://nomnoml.com/#file/criticalpath
  * 
  * start
  * ->A->D -> end
@@ -11,26 +11,46 @@ import { Node } from './js/node.js';
  * ->C->E->end     
  */
 const start = new Node ('start', 0);
-const A = new Node ('A', 6);
-const B = new Node ('B', 8);
-const C = new Node ('C', 3);
-const D = new Node ('D', 1);
-const E =new Node ('E', 10);
-const F = new Node ('F', 8);
-const G = new Node('G', 1)
+const maA = new Node ('määrittely A', 6);
+const epA = new Node ('elementtiproto A', 8);
+const toA = new Node ('toteutus A', 3);
+const teA = new Node ('testaus A', 1);
+const maB = new Node ('määrittely B', 5);
+const epB = new Node ('elementtiproto B', 7);
+const toB = new Node ('toteutus B', 2);
+const teB = new Node ('testaus B', 2);
+const teAB = new Node ('testaus AB', 1);
+const maC = new Node ('määrittely C', 8);
+const epC = new Node ('elementtiproto C', 4);
+const toC = new Node ('toteutus C', 8);
+const teC = new Node ('testaus C', 2);
+const teABC = new Node ('testaus ABC', 1);
 const end = new Node ('end', 0);
 
-start.nexts = [A, B, C];	
-A.nexts = [D,F];		
-B.nexts = [F];				
-C.nexts = [E];				
-D.nexts = [end];			
-E.nexts = [end];			
-F.nexts = [G];	
-G.nexts = [end];		
+start.nexts = [maA, maB, maC];	
+maA.nexts = [epA];		
+epA.nexts = [toA, epB];
+toA.nexts = [teA];		
+teA.nexts = [teAB];		
+maB.nexts = [epB];		
+epB.nexts = [toB];
+toB.nexts = [teB, toC];
+teB.nexts = [teAB];
+teAB.nexts = [teABC];		
+maC.nexts = [epC, epB];		
+epC.nexts = [toC];
+toC.nexts = [teC];		
+teC.nexts = [teABC];
+teABC.nexts = [end];	
 end.nexts = [];				
 
-let net = [start, A, B, C, D, E, F, G, end];
+let net = [
+	start, 
+	maA, epA, toA, teA, 
+	maB, epB, toB, teB, teAB,
+	maC, epC, toC, teC, teC, teABC, 
+	end
+];
 net.forEach(node => {
 	node.nexts.forEach(next => {
 		next.prevs.push(node)
@@ -128,15 +148,6 @@ function allLatestVisited(nodes) {
 	return true;
 }
 
-function allDrawnVisited(nodes) {
-	for (const node of nodes) {
-		if (!node.drawnVisited) {
-			return false;
-		}
-	}
-	return true;
-}
-
 function minLs(nodes) {
 	let min = Infinity;
 	for (const node of nodes) {
@@ -148,14 +159,20 @@ function minLs(nodes) {
 }
 
 function nomnoml(net, start, end) {
-	let result = '';
+	let result = '#direction: right\n';
+	result += '#.crit: visual=table fill=red title=bold\n';
 	for (const node of net) {
 		if (node===start) {
 			result += '[<start>start]\n'
 		} else if (node===end) {
 			result += '[<end>end]\n'
 		} else {
-			result += '[<table>'+node.name+'|'
+			if (node.drag==0) {
+				result += '[<crit>'
+			} else {
+				result += '[<table>'
+			}
+			result += node.name+'|'
 				+ node.es+'|'+node.tr+'|'+node.ef+'||'
 				+ node.ls+'|'+node.drag+'|'+node.lf+']\n';
 		}
