@@ -1,0 +1,12 @@
+{
+  "name": "criticalpath",
+  "version": "1.0.0",
+  "description": "kriittinen polku, algoritmin testaus",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "ak",
+  "license": "ISC",
+  "type": "module"
+}
